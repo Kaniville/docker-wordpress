@@ -1,11 +1,11 @@
 version: "3.3"
 
-# Services
+  # Services
 services:
   # docker exec -ti CONTAINER_NAME sh -c "chown -R www-data:www-data wp-content"
   # Wordpress
   wordpress:
-    image: wordpress:5.9-apache
+    image: wordpress:6.0-apache
     ports:
       - 127.0.0.1:80:80
     volumes:
@@ -19,11 +19,11 @@ services:
     depends_on:
       - mariadb
       - phpmyadmin
-    restart: always
+    #restart: always
 
   # Mariadb
   mariadb:
-    image: mariadb:10.7
+    image: mariadb:10.8
     ports:
       - 127.0.0.1:3306:3306
     volumes:
@@ -31,20 +31,41 @@ services:
       - ./config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:rw
     environment:
       MARIADB_ROOT_PASSWORD: root
-    restart: always
+    #restart: always
 
   # Phpmyadmin
   phpmyadmin:
-    image: phpmyadmin
+    image: phpmyadmin:5.2-apache
     ports:
       - 127.0.0.1:8080:80
     environment:
-      PMA_HOST: mariadb
+      PMA_HOST: mariadb:3306
       PMA_USER: root
       PMA_PASSWORD: root
     depends_on:
       - mariadb
-    restart: always
+    #restart: always
+
+  # Wordpress CLI
+  cli:
+    image: wordpress:cli-2.6
+    volumes:
+      - wpdata:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: root
+    depends_on:
+      - wordpress
+      - mariadb
+
+  # Node JS
+  node:
+    image: node:18.2
+    volumes:
+      - ./wp-content/app:/var/www/html/wp-content/themes/custom-theme/app:rw
+    working_dir: /var/www/html/wp-content/themes/custom-theme/app
+    #restart: always
 
 # Volumes
 volumes:
