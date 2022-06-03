@@ -1,66 +1,68 @@
 # Installation
 
-Installer `docker` et `docker-compose`
+Install `docker` & `docker-compose`
 
-Sur Debian & Ubuntu:
+Debian & Ubuntu:
 ```bash
-sudo apt install docker docker-compose
+# apt install docker docker-compose
 ```
 
-Sur ArchLinux:
+ArchLinux:
 ```bash
-sudo pacman -S docker docker-compose
+# pacman -S docker docker-compose
 ```
 
-Vous pouvez également installer `git` et faire `git clone https://github.com/Kaniville/docker-wordpress` pour le télecharger.
+You can clone the repository with `git` (`git clone https://github.com/Kaniville/docker-wordpress`).
 
-Si vous avez décider de télecharger le fichier zip, un simple `unzip NOM_DU_ZIP.zip` dans le répertoire ou il a été télecharger suffit à le décompresser.
+You can also download a ZIP file from the Github UI and unzip it with `unzip NAME_OF_FILE.zip`
 
 # Configuration
 
-Dans le repertoire du serveur, entrer la commande `sudo docker-compose up -d`.
+Use the command `# docker-compose up -d` (with root privileges) from the "docker-wordpress" directory to start the Wordpress Server.
 
-Puis entrez cette commande afin de rendre accessible le dossier "wp-content" à docker:
+Enter this command to enter inside the Wordpress Container
 ```
-# docker exec -ti WORDPRESS_CONTAINER_NAME sh -c "chown -R www-data:www-data wp-content"
-```
-
-Exemple:
-```
-# docker exec -ti docker-wordpress-wordpress-1 sh -c "chown -R www-data:www-data wp-content"
-
+# docker-compose exec wordpress bash
 ```
 
-Enfin creez la base de donnée `wordpress` depuis votre `localhost:8080`, et voila, configurez Wordpress et tout est bon !
-
-- Pour eteindre le serveur, faire `sudo docker-compose stop`
-
-- Pour voir les infos des containers, faire `sudo docker-compose ps`
-
-- PHP-MY-ADMIN se situe au localhost au port `:8080` (`localhost:8080`)
-
-- Pour accéder à la ligne de commande de mariadb (mysql), faire:
+From here, we need to change permissions to let us edit and create files
 ```
-sudo docker exec -ti docker-wordpress-mariadb-1 mysql -u root -p
+cd ..
+umask 0007 html
+find html -type d -exec sudo chmod 775 {} +
+find html -type f -exec sudo chmod 664 {} +
 ```
-<sub>Ici, `docker-wordpress-mariadb-1` est le nom du container mariadb (mysql)</sup>
 
-<hr>
+# Commands
+
+- Start the server: `# docker-compose start`
+
+- Stop the server: `# docker-compose stop`
+
+- Show containers informations: `# docker-compose ps`
+
+- Show logs from a container: `# docker-compose logs CONTAINER_NAME`
+
+- Delete container(s): `# docker-compose rm CONTAINER_NAME` or without the container name
+
+# Informations
+
+- Phpmyadmin is at "localhost:8080"
+
+- To access the mariadb console, enter:
+```
+# docker-compose exec MARIADB_CONTAINER_NAME mysql -u root -p
+```
 
 ```
-.                                <--Lancer le serveur depuis ici
+.                   <-- Start the server from here
 ├── config
 │   └── mysql
 │       └── my.cnf
+├── wp-content
+│   └── ...
 ├── docker-compose.yml
 ├── README.md
+
 ```
-<sub>Repertoire du serveur Wordpress</sub>
-
-- Pour afficher les infos des images/containers docker, `sudo docker images` & `sudo docker container ps`
-
-- Pour supprimer toutes les images docker inutilisées, `sudo docker image prune`
-
-- Pour supprimer tout les containers inutilisés, `sudo docker container prune`
-
-- Pour supprimer une seule image ou un seul container, remplacez `prune` par `rm CONTAINER_ID`
+<sub>Directory of the Wordpress server</sub>
