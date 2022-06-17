@@ -1,24 +1,18 @@
 version: "3.3"
 
-  # Services
 services:
-
-  # Mariadb
   mariadb:
-    image: mariadb:10.8
+    image: mariadb
     ports:
       - 127.0.0.1:3306:3306
     volumes:
       - mariadbdata:/var/lib/mysql
-      - ./config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:rw
     environment:
       MARIADB_DATABASE: wordpress
       MARIADB_ROOT_PASSWORD: root
-    #restart: always
 
-  # Phpmyadmin
   phpmyadmin:
-    image: phpmyadmin:5.2-apache
+    image: phpmyadmin
     ports:
       - 127.0.0.1:8080:80
     volumes:
@@ -29,11 +23,9 @@ services:
       PMA_PASSWORD: root
     depends_on:
       - mariadb
-    #restart: always
 
-  # Wordpress
   wordpress:
-    image: wordpress:6.0-apache
+    image: wordpress
     ports:
       - 127.0.0.1:80:80
     volumes:
@@ -47,11 +39,9 @@ services:
       WORDPRESS_CONFIG_EXTRA: define( 'FS_METHOD', 'direct' );
     depends_on:
       - mariadb
-    #restart: always
 
-  # Wordpress CLI
   cli:
-    image: wordpress:cli-2.6
+    image: wordpress:cli
     volumes:
       - wpdata:/var/www/html
     environment:
@@ -61,9 +51,7 @@ services:
     depends_on:
       - wordpress
       - mariadb
-    #restart: always
 
-# Volumes
 volumes:
   mariadbdata:
   phpmyadmindata:
